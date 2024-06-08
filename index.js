@@ -3,6 +3,7 @@ import cors from "cors"; //Middleweare to enable cross-origin ResourcesSharing, 
 import dotenv from "dotenv"; //module to load envirnment variables from a `.env` file, keeping sensitive data secure.
 import express from "express"; //A webframework for Node.js used to build application's server.
 import helmet from "helmet"; //helps secure application by setting various HTTP headers
+import mongoose from "mongoose";
 import morgan from "morgan"; //HTTP request logger middleweare logging requests.
 import multer from "multer"; //Multer middleweare to handle file uplods.
 import path from "path"; //provides utilites for working with fle and directory paths.
@@ -22,6 +23,9 @@ app.use(bodyParser.urlencoded({limit: "30mb", extended:true}));
 app.use(cors());
 app.use("/assets", express.static(path.json(__dirname, 'public/assets')));
 
+
+   /* File Storage */
+
 const storage = multer.diskStorage({
     destination: function(req, file, cb)
 {
@@ -29,4 +33,18 @@ const storage = multer.diskStorage({
 }, 
 filename: function (req, file, cb){
     cb(null, file.originalname);
-}});
+},
+});
+const upload = multer({storage});
+
+
+/*Mongoose Setup */
+const PORT = process.env.PORT || 6001;
+mongoose.connect(process.env.MONGO_URL,{
+    useNewUrlParse:true,
+    useUnifiedTopology:true,
+
+}).then(()=>{
+    app.listen(PORT, ()=> console.log(`Server Port: ${PORT}`));
+
+}).catch((error)=>console.log(`${error} did not connect`));
